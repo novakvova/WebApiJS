@@ -14,6 +14,11 @@ namespace WebSiteApi.Controllers
         public string Name { get; set; }
         public string Description { get; set; }
     }
+    public class RoleCreateViewModel
+    {
+        public string Name { get; set; }
+        public string Description { get; set; }
+    }
     public class RoleController : Controller
     {
         // GET: Role
@@ -40,6 +45,27 @@ namespace WebSiteApi.Controllers
             }
             return Content(json, "application/json");
         }
+        [HttpPost]
+        public ContentResult Create(RoleCreateViewModel roleModel)
+        {
+            Role role = new Role
+            {
+                Name = roleModel.Name,
+                Description = roleModel.Description
+            };
+            string json;
+            using (EFContext context = new EFContext())
+            {
+                context.Roles.Add(role);
+                context.SaveChanges();
+                json = JsonConvert.SerializeObject(
+                        new
+                        {
+                            Id = role.Id
+                        });
+            }
+            return Content(json, "application/json");
 
+        }
     }
 }
