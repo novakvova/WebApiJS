@@ -9,7 +9,7 @@ namespace DAL.Entity
 {
     public class EFContext : DbContext
     {
-        public EFContext() : base("shopConnection")
+        public EFContext() : base("shopAzureConnection")
         {
 
         }
