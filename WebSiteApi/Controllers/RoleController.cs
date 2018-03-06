@@ -26,8 +26,9 @@ namespace WebSiteApi.Controllers
         {
             return View();
         }
-        public ContentResult List()
+        public ContentResult List(int page = 1, int countPage = 10)
         {
+            int skipElement = (page - 1) * countPage;
             string json = "";
             using (EFContext context = new EFContext())
             {
@@ -36,11 +37,17 @@ namespace WebSiteApi.Controllers
                     Id = r.Id,
                     Name = r.Name,
                     Description = r.Description
-                }).ToList();
+                })
+                .OrderBy(r=>r.Id)
+                .Skip(skipElement)
+                .Take(countPage)
+                .ToList();
+                int total = context.Roles.Count();
                 json = JsonConvert.SerializeObject(
                         new
                         {
-                            Roles = roles
+                            Roles = roles,
+                            Total= total
                         });
             }
             return Content(json, "application/json");
