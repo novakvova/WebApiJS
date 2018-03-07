@@ -26,13 +26,24 @@ namespace WebSiteApi.Controllers
         {
             return View();
         }
-        public ContentResult List(int page = 1, int countPage = 10)
+        public ContentResult List(int page = 1, 
+            int countPage = 10, string name="",
+            string description="")
         {
             int skipElement = (page - 1) * countPage;
             string json = "";
             using (EFContext context = new EFContext())
             {
-                var roles = context.Roles.Select(r => new RoleViewModel
+                var query = context.Roles.AsQueryable();
+                if(!string.IsNullOrEmpty(name))
+                {
+                    query = query.Where(r => r.Name.Contains(name));
+                }
+                if (!string.IsNullOrEmpty(description))
+                {
+                    query = query.Where(r => r.Description.Contains(description));
+                }
+                var roles = query.Select(r => new RoleViewModel
                 {
                     Id = r.Id,
                     Name = r.Name,
@@ -42,7 +53,7 @@ namespace WebSiteApi.Controllers
                 .Skip(skipElement)
                 .Take(countPage)
                 .ToList();
-                int total = context.Roles.Count();
+                int total = query.Count();
                 json = JsonConvert.SerializeObject(
                         new
                         {
